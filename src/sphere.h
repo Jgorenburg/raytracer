@@ -5,6 +5,8 @@
 #include "hittable.h"
 #include "AGLM.h"
 
+using namespace glm;
+
 class sphere : public hittable {
 public:
    sphere() : radius(0), center(0), mat_ptr(0) {}
@@ -20,7 +22,36 @@ public:
 };
 
 bool sphere::hit(const ray& r, hit_record& rec) const {
-   glm::vec3 oc = r.origin() - center;
+
+    vec3 oc = center - r.origin();
+    float len = length(r.direction());
+    vec3 normR = r.direction()/len;
+   // vec3 normR = normalize(r.direction());
+    float s = dot(oc, normR);
+    float ocSqr = dot(oc, oc);
+    float rSqr = dot(radius, radius);
+    float mSqr = ocSqr - (s * s);
+
+    if (s < 0 && ocSqr > rSqr) { return false; }
+    else if (mSqr > rSqr) { return false; }
+    else {
+        float q = sqrt(rSqr - mSqr);
+        float t;
+        if (ocSqr > rSqr) { t = s - q; }
+        else              { t = s + q; }
+
+        rec.t = t/len;
+        rec.p = r.at(rec.t);
+        rec.mat_ptr = mat_ptr;
+
+        glm::vec3 outward_normal = normalize(rec.p - center); // compute unit length normal
+        rec.set_face_normal(r, outward_normal);
+
+        return true;
+    }
+    
+    
+   /*glm::vec3 oc = r.origin() - center;
    float a = glm::dot(r.direction(), r.direction());
    float half_b = glm::dot(oc, r.direction());
    float c = glm::length2(oc) - radius*radius;
@@ -43,6 +74,7 @@ bool sphere::hit(const ray& r, hit_record& rec) const {
    rec.set_face_normal(r, outward_normal);
 
    return true;
+   */
 }
 
 #endif

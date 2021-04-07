@@ -59,26 +59,33 @@ int main(int argc, char** argv)
                ray(point3(0, 0, 3), vec3(0, 0, -1)), // ray outside/towards sphere
                true, 
                hit_record{vec3(0,0,2), vec3(0,0,1), 1, true, empty}); 
-
+   cout << "1st worked\n";
    test_sphere(s, 
                ray(point3(0, 0, 0), vec3(0, 0, -1)), // ray inside sphere
                true, 
                hit_record{ vec3(0,0,-2), vec3(0,0,1), 2, false, empty}); 
+   cout << "2nd worked\n";
 
+   
    test_sphere(s, 
                ray(point3(0, 0, 3), vec3(0, 0, 1)), // ray outside/away sphere
                false, 
                none); 
-
+   cout << "3rd worked\n";
+   
    test_sphere(s, 
                ray(point3(0, 0, 3), vec3(0, 5,-1)), // ray outside/towards sphere (miss)
                false, 
                none); 
+   cout << "4th worked\n";
 
+   
    test_sphere(s, 
                ray(point3(0, 0, 3), vec3(0, 1,-3)), // ray outside/towards sphere (hit)
                true, 
                hit_record{vec3(0,0.3432f, 1.9703f), vec3(0,0.1716f, 0.9851f), 0.3432f, true, empty}); 
+    
+   cout << "5th worked\n";
 
    // TODO: Your tests here
 }

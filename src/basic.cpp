@@ -5,6 +5,8 @@
 #include "AGLM.h"
 #include "ray.h"
 #include "sphere.h"
+#include "box.h"
+#include "plane.h"
 #include "camera.h"
 #include "material.h"
 #include "hittable_list.h"
@@ -64,10 +66,14 @@ void ray_trace(ppm_image& image)
 
    // World
    shared_ptr<material> gray = make_shared<lambertian>(color(0.5f));
+   shared_ptr<material> red = make_shared<lambertian>(color(1, 0, 0));
+   shared_ptr<material> blue = make_shared<lambertian>(color(0, 0, 1));
 
    hittable_list world;
-   world.add(make_shared<sphere>(point3(0, 0, -1), 0.5f, gray));
-   world.add(make_shared<sphere>(point3(0, -100.5, -1), 100, gray));
+   world.add(make_shared<sphere>(point3(0, 0, -1), 0.5f, red));
+   world.add(make_shared<box>(point3(2, -0.2f, -2), vec3(0, 1, 0), vec3(1, 0, 0), vec3(0, 0, 1), 0.5f, 0.5f, 0.5f, blue));
+ //  world.add(make_shared<sphere>(point3(0, -100.5, -1), 100, gray));
+   world.add(make_shared<plane>(point3(0, -0.2f, -1), vec3(1, 1, 0), gray));
 
    // Camera
    vec3 camera_pos(0);
