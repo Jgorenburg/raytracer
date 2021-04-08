@@ -6,6 +6,10 @@
 #include "ray.h"
 #include "hittable.h"
 
+using namespace glm;
+using namespace std;
+
+
 class material {
 public:
   virtual bool scatter(const ray& r_in, const hit_record& rec, 
@@ -73,9 +77,23 @@ public:
   virtual bool scatter(const ray& r_in, const hit_record& hit, 
      glm::color& attenuation, ray& scattered) const override 
   {
-     // todo
-     attenuation = glm::color(0);
-     return false;
+      // ambient
+      color ambient = ka * ambientColor;
+
+      // diffuse
+      vec3 unitn = normalize(hit.normal); 
+      vec3 lightDir = normalize(lightPos - hit.p); 
+      color diffuse = kd * max(vec3(0), dot(unitn, lightDir)) * diffuseColor;
+
+      // spec
+      vec3 unitr = normalize(2 * dot(lightDir, unitn) * unitn - lightDir);
+      vec3 viewDir = normalize(viewPos - hit.p);
+      float highlight = dot(viewDir, unitr);
+      if (highlight < 0) { highlight = 0; }
+      color spec = ks * pow(highlight, shininess) * specColor;
+
+      attenuation = ambient + diffuse + spec;
+      return false;
   }
 
 public:
@@ -97,9 +115,10 @@ public:
    virtual bool scatter(const ray& r_in, const hit_record& rec, 
       glm::color& attenuation, ray& scattered) const override 
    {
-     // todo
-      attenuation = albedo;
-      return false;
+       vec3 reflected = reflect(normalize(r_in.direction()), normalize(rec.normal));
+       scattered = ray(rec.p, reflected + fuzz * random_unit_vector());
+       attenuation = albedo;
+       return (dot(scattered.direction(), rec.normal) > 0);
    }
 
 public:
@@ -114,9 +133,36 @@ public:
   virtual bool scatter(const ray& r_in, const hit_record& rec, 
      glm::color& attenuation, ray& scattered) const override 
    {
-     // todo
-     attenuation = glm::color(0);
-     return false;
+      attenuation = color(1);
+      float refraction_ratio = ir;
+      if (rec.front_face) {
+          refraction_ratio = 1 / ir;
+      }
+      vec3 udir = normalize(r_in.direction());
+      vec3 unorm = normalize(rec.normal);
+
+      float costheta = fmin(dot(-udir, unorm), 1.0);
+      float sintheta = sqrt(1.0 - pow(costheta, 2));
+
+      double r0 = pow((1 - refraction_ratio) / (1 + refraction_ratio), 2);
+      double shlick = r0 + (1 - r0) * pow((1 - costheta), 5);
+
+
+      if (refraction_ratio * sintheta > 1.0f || shlick > random_float(0, 1)) {
+          vec3 reflected = reflect(udir, unorm);
+          scattered = ray(rec.p, reflected);
+          return (dot(scattered.direction(), rec.normal) > 0);
+      }
+      else {
+          vec3 rperp = refraction_ratio * (udir + costheta * unorm);
+          float lperp = length(rperp);
+          float lpar = -sqrt(abs(1.0f - pow(lperp, 2)));
+          vec3 rpar = lpar * unorm;
+          vec3 refracted = rperp + rpar;
+
+          scattered = ray(rec.p, refracted);
+          return true;
+      }
    }
 
 public:
