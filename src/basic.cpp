@@ -69,6 +69,7 @@ void ray_trace(ppm_image& image)
    shared_ptr<material> red = make_shared<lambertian>(color(1, 0, 0));
    shared_ptr<material> green = make_shared<lambertian>(color(0, 0.4f, 0));
    shared_ptr<material> blue = make_shared<lambertian>(color(0, 0, 1));
+   shared_ptr<material> black = make_shared<lambertian>(color(0));
    shared_ptr<material> whitish = make_shared<metal>(color(0.9, 0.9, 0.9), 0);
    shared_ptr<material> white = make_shared<metal>(color(1), 0);
    shared_ptr<material> purple = make_shared<phong>(color(0.7, 0, 0.7), color(1, 1, 1), color(0.1, 0, 0.1), point3(5, 5, 1), 
@@ -78,6 +79,9 @@ void ray_trace(ppm_image& image)
    
    hittable_list world;
    
+
+   // final
+   /*
    world.add(make_shared<box>(point3(0, 0, 0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 6, 3, 3, white));
    world.add(make_shared<plane>(point3(1, 1, 2.5f), vec3(0.5f, 0.2f, 1), white));
    world.add(make_shared<plane>(point3(-4, 0, 0), vec3(1, 0, 0.3f), white));
@@ -89,7 +93,21 @@ void ray_trace(ppm_image& image)
    world.add(make_shared<box>(point3(-2.5f, -2.5f, 0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.3f, 0.3f, 0.3f, blue));
    world.add(make_shared<box>(point3(5, 2.5f, -3), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.3f, 0.3f, 1, purple));
    world.add(make_shared<box>(point3(0, -2.5f, 0), vec3(1, 1, 0), vec3(0, 1, 1), vec3(1, 0, 1), 0.5f, 0.5f, 0.5f, refract));
+   */
 
+   //box
+   /*
+   world.add(make_shared<box>(point3(0, -5, 0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 100, 1, 100, black));
+   world.add(make_shared<box>(point3(-1, 0, -1), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.3f, 0.3f, 0.3f, refract));
+   world.add(make_shared<box>(point3(1, 0.6f, -3), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.3f, 0.3f, 2, blue));
+   world.add(make_shared<box>(point3(0, 0, -1.5), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.5f, 0.5f, 0.5f, purple));
+   */
+
+   // plane
+   world.add(make_shared<plane>(point3(0, 0, -7), vec3(0.3f, 0, 1), purple));
+   world.add(make_shared<plane>(point3(0, -0.3, 0), vec3(0, 1, 0), blue));
+   world.add(make_shared<sphere>(point3(0, 0, -1.5f), 0.5f, red));
+  
 
 
 
