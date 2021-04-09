@@ -67,31 +67,41 @@ void ray_trace(ppm_image& image)
    // World
    shared_ptr<material> gray = make_shared<lambertian>(color(0.5f));
    shared_ptr<material> red = make_shared<lambertian>(color(1, 0, 0));
+   shared_ptr<material> green = make_shared<lambertian>(color(0, 0.4f, 0));
    shared_ptr<material> blue = make_shared<lambertian>(color(0, 0, 1));
    shared_ptr<material> whitish = make_shared<metal>(color(0.9, 0.9, 0.9), 0);
+   shared_ptr<material> white = make_shared<metal>(color(1), 0);
    shared_ptr<material> purple = make_shared<phong>(color(0.7, 0, 0.7), color(1, 1, 1), color(0.1, 0, 0.1), point3(5, 5, 1), 
        point3(0,0,0), 0.45f,  0.45f,  0.1f, 10);
    shared_ptr<material> refract = make_shared<dielectric>(1.5);
 
-   shared_ptr<material> material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
-   shared_ptr<material> material_center = make_shared<lambertian>(color(0.1, 0.2, 0.5));
-   shared_ptr<material> material_left = make_shared<dielectric>(1.5);
-   shared_ptr<material> material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
-
+   
    hittable_list world;
+   
+   world.add(make_shared<box>(point3(0, 0, 0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 6, 3, 3, white));
+   world.add(make_shared<plane>(point3(1, 1, 2.5f), vec3(0.5f, 0.2f, 1), white));
+   world.add(make_shared<plane>(point3(-4, 0, 0), vec3(1, 0, 0.3f), white));
+   world.add(make_shared<sphere>(point3(6, 3, -3), 0.5f, white));
+   world.add(make_shared<sphere>(point3(2, 2, 0), 0.5f, red));
+   world.add(make_shared<sphere>(point3(3, 2, -2), 0.5f, purple));
+   world.add(make_shared<sphere>(point3(-1, 2.2f, 2), 0.5f, gray));
+   world.add(make_shared<sphere>(point3(-2, -5, -1), 3, green));
+   world.add(make_shared<box>(point3(-2.5f, -2.5f, 0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.3f, 0.3f, 0.3f, blue));
+   world.add(make_shared<box>(point3(5, 2.5f, -3), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.3f, 0.3f, 1, purple));
+   world.add(make_shared<box>(point3(0, -2.5f, 0), vec3(1, 1, 0), vec3(0, 1, 1), vec3(1, 0, 1), 0.5f, 0.5f, 0.5f, refract));
+
+
+
+
+   // used for most examples
    /*
    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5f, refract));
-   world.add(make_shared<box>(point3(2, 0.5, -2), vec3(0, 1, 0), vec3(1, 0, 0), vec3(0, 0, 1), 0.5f, 0.5f, 0.5f, purple));
+   world.add(make_shared<box>(point3(2, 0, -2), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), 0.5f, 0.5f, 0.5f, purple));
    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100, blue));
    world.add(make_shared<plane>(point3(-2, 0, 0), vec3(1, 0, 0), whitish));
    */
 
-   world.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, material_ground));
-   world.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, material_center));
-   world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
-   world.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), -0.4, material_left));
-   world.add(make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
-
+   
    // refract
    //world.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, gray));
    //world.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, refract));
@@ -99,8 +109,10 @@ void ray_trace(ppm_image& image)
    // Camera
    vec3 camera_pos(0);
    float viewport_height = 2.0f;
-   float focal_length = 1.0; 
-   camera cam(camera_pos, viewport_height, aspect, focal_length);
+   float focal_length = 1.0f; 
+   float focalDist = 1.0f;
+   float aperture = 0;
+   camera cam(camera_pos, viewport_height, aspect, focal_length, aperture);
 
    // Ray trace
    for (int j = 0; j < height; j++)
